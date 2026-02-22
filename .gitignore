@@ -1,0 +1,38 @@
+
+
+# =========================
+# Virtual Environment
+# =========================
+venv/
+.env/
+.env.*
+!.env.example
+
+# =========================
+# Logs & Runtime
+# =========================
+logs/
+*.log
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+
+
+# =========================
+# FastAPI / Uvicorn
+# =========================
+*.pid
+
+
+# =========================
+# Secrets
+# =========================
+.env.development
+.env.production
+.env.testing

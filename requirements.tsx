@@ -10,3 +10,4 @@ python-multipart
 alembic
 celery[redis]
 redis
+faker

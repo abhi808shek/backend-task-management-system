@@ -1,44 +1,4 @@
-"""
-Production migration — users + tasks with full indexing strategy.
 
-INDEX DESIGN FOR 100k USERS / 1M TASKS
-═══════════════════════════════════════
-
-USERS TABLE
-───────────
-Single-column indexes (rule engine DB filters):
-  ix_users_department          → WHERE department = 'Finance'
-  ix_users_location            → WHERE location = 'Mumbai'
-  ix_users_is_active           → WHERE is_active = true
-
-Composite index (most common rule engine query pattern):
-  ix_users_dept_exp_active     → WHERE department = ? AND experience_years >= ? AND is_active = true
-  This single index covers 80% of all rule engine queries.
-
-TASKS TABLE
-───────────
-Single-column indexes:
-  ix_tasks_assigned_to         → WHERE assigned_to = user_id
-  ix_tasks_status              → WHERE status = 'todo'
-  ix_tasks_is_active           → WHERE is_active = true
-  ix_tasks_created_by          → WHERE created_by = admin_id
-
-Composite indexes:
-  ix_tasks_assigned_active_status  → (assigned_to, is_active, status)
-    Powers GET /my-eligible-tasks → covers the FULL WHERE clause
-    Query: WHERE assigned_to=? AND is_active=true AND status != 'done'
-    At 1M tasks: index lookup → ~5ms instead of ~500ms full scan
-
-  ix_tasks_assigned_status         → (assigned_to, status)
-    Powers active task COUNT queries in rule engine
-    Query: WHERE assigned_to=? AND status != 'done' AND is_active=true
-
-  ix_tasks_unassigned_active       → (assigned_to, is_active) WHERE assigned_to IS NULL
-    Partial index — powers retry_unassigned_tasks Celery beat
-    Only indexes the NULL assigned_to rows (much smaller than full index)
-
-Revision ID: 001_initial
-"""
 
 from alembic import op
 import sqlalchemy as sa
